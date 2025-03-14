@@ -1,12 +1,9 @@
 const Categories = require("./model");
+const { getAllCategories, createCategories, getOneCategories, updateCategories, deleteCategories } = require("../../../services/mongoose/categories");
 
 const create = async (req, res, next) => {
   try {
-    let { name } = req.body;
-
-    let category = new Categories({ name });
-
-    await category.save();
+    let category = await createCategories(req);
 
     res.status(201).json({ result: category });
   } catch (err) {
@@ -22,7 +19,7 @@ const create = async (req, res, next) => {
 
 const index = async (req, res, next) => {
   try {
-    const result = await Categories.find().select("_id name ");
+    const result = await getAllCategories();
 
     res.status(200).json({
       data: result,
@@ -34,15 +31,8 @@ const index = async (req, res, next) => {
 
 const find = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    if (!id.match(/^[0-9a-fA-F]{24}$/))
-      return res.status(400).json({ message: "Invalid ID" });
-    const result = await Categories.findOne({ _id: id }); //Menggunakan find One
+    const result = await getOneCategories(req);
 
-    if (!result)
-      return res
-        .status(404)
-        .json({ message: `Data with id:${id} doesn't exist` });
     res.status(200).json({
       data: result,
     });
@@ -53,17 +43,7 @@ const find = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const { name } = req.body;
-
-    if (!id.match(/^[0-9a-fA-F]{24}$/))
-      return res.status(400).json({ message: "Invalid ID" });
-
-    const result = await Categories.findByIdAndUpdate(
-      { _id: id },
-      { name },
-      { new: true, runValidators: true }
-    );
+    const result = await updateCategories(req);
     res.status(200).json({ data: result });
   } catch (err) {
     next(err);
@@ -72,12 +52,7 @@ const update = async (req, res, next) => {
 
 const destroy = async (req, res, next) => {
   try {
-    const { id } = req.params;
-
-    if (!id.match(/^[0-9a-fA-F]{24}$/))
-      return res.status(400).json({ message: "Invalid ID" });
-
-    const result = await Categories.findOneAndDelete({ _id: id });
+    const result = await deleteCategories(req);
 
     res.status(200).json({ data: result });
   } catch (err) {

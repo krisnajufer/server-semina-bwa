@@ -8,6 +8,7 @@ let categorySchema = Schema(
       minLength: [3, "Name is too short"],
       maxLength: [20, "Name is too long"],
       required: [true, "Name is required"],
+      unique: true
     },
   },
   { timestramps: true }
